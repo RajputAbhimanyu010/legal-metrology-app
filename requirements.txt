@@ -1,0 +1,7 @@
+easyocr
+fastapi
+uvicorn
+python-multipart
+reportlab
+streamlit
+requests
