@@ -5,3 +5,7 @@ python-multipart
 reportlab
 streamlit
 requests
+Pillow
+streamlit-image-coordinates
+python-docx
+passlib

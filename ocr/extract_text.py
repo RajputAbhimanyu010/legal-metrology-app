@@ -5,13 +5,45 @@ Purpose: Take a product label image, return all detected text + positions.
 Install first:
     pip install easyocr --break-system-packages
 
-This uses EasyOCR (free, offline, supports English + Hindi).
+This uses EasyOCR (free, offline). Set to ENGLISH ONLY by default —
+combining English + Hindi in one reader noticeably hurts accuracy on
+English-only labels (it tries to match every character against both
+scripts) and roughly doubles processing time. If your test products
+have Hindi text you need to read, switch LANGUAGES below, but expect
+a real accuracy/speed trade-off on English text when you do.
 """
 
 import easyocr
+from PIL import Image
+
+LANGUAGES = ['en']  # add 'hi' only if you specifically need Hindi text read
 
 # Load once and reuse (loading the model is slow, don't reload per image)
-reader = easyocr.Reader(['en', 'hi'], gpu=False)
+reader = easyocr.Reader(LANGUAGES, gpu=False)
+
+# Resize any image wider than this before OCR — large phone camera photos
+# (often 3000-4000px wide) make OCR much slower for no accuracy benefit.
+# 1600px is generally plenty to read label text clearly.
+MAX_IMAGE_WIDTH = 1600
+
+
+def _resize_if_needed(image_path: str) -> str:
+    """
+    If the image is larger than MAX_IMAGE_WIDTH, resize it and save a
+    temp copy — speeds up OCR significantly on modern phone photos.
+    Returns the path to use (original or resized temp copy).
+    """
+    img = Image.open(image_path)
+    if img.width <= MAX_IMAGE_WIDTH:
+        return image_path
+
+    scale = MAX_IMAGE_WIDTH / img.width
+    new_size = (MAX_IMAGE_WIDTH, int(img.height * scale))
+    resized = img.resize(new_size, Image.LANCZOS)
+
+    resized_path = image_path.rsplit(".", 1)[0] + "_resized." + image_path.rsplit(".", 1)[-1]
+    resized.save(resized_path)
+    return resized_path
 
 
 def extract_text_from_image(image_path: str):
@@ -22,7 +54,8 @@ def extract_text_from_image(image_path: str):
         ...
     ]
     """
-    results = reader.readtext(image_path)
+    processed_path = _resize_if_needed(image_path)
+    results = reader.readtext(processed_path)
 
     blocks = []
     for bbox, text, confidence in results:
