@@ -109,3 +109,38 @@ python3 rules_engine/checker.py                    # rules engine, standalone
 python3 ocr/extract_text.py test_images/sample1.jpg # OCR, standalone
 python3 backend/auth.py                             # creates DB + default admin
 ```
+
+## Improved OCR + optional local AI
+
+The OCR pipeline now runs several preprocessing passes (contrast enhancement,
+denosing, adaptive thresholding and upscaling) and deduplicates overlapping
+EasyOCR detections. This is more robust than a single raw OCR pass.
+
+An optional **local AI vision** pass is available through Ollama. It is disabled
+by default, so the project still works without any cloud AI or Google Cloud
+billing. To enable it:
+
+1. Install Ollama from https://ollama.com/
+2. Run `ollama pull gemma3:4b`
+3. Copy `.env.example` settings into your environment and set
+   `AI_OCR_ENABLED=true`
+4. Start the backend and scan an image.
+
+The AI output is kept separately in the API response for auditability. The
+rules engine remains deterministic; AI is not allowed to invent legal rules.
+
+### Included OCR test images
+
+- `test_images/compliant_label.png` — expected to contain all common declarations
+- `test_images/missing_mrp.png` — intentionally missing MRP
+- `test_images/missing_consumer_care.png` — intentionally missing contact details
+- `test_images/blurred_label.png` — degraded image for OCR robustness testing
+
+Run:
+
+```bash
+python scripts_test_ocr.py
+```
+
+The test images are synthetic labels created for OCR/compliance testing; they
+are not official product packaging or legal evidence.

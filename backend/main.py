@@ -17,6 +17,7 @@ import os
 import sqlite3
 import sys
 from datetime import datetime
+from uuid import uuid4
 from typing import Optional
 
 from fastapi import FastAPI, UploadFile, File, Form, Header, HTTPException
@@ -26,7 +27,10 @@ from fastapi.responses import FileResponse
 # allow importing sibling folders (ocr/, rules_engine/)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ocr.extract_text import extract_text_from_image, get_full_text
+from ocr.extract_text import (
+    extract_text_from_image, get_full_text, ai_extract_text, ai_analyze_label,
+    assess_image_quality, build_combined_text,
+)
 from rules_engine.checker import run_all_checks, calculate_pixels_per_mm
 from backend.report import generate_pdf_report, generate_docx_report
 from backend.auth import (
@@ -64,7 +68,12 @@ def init_db():
             scan_time TEXT,
             compliance_score REAL,
             overall_status TEXT,
-            checks_json TEXT
+            checks_json TEXT,
+            extracted_text TEXT,
+            ai_analysis_json TEXT,
+            ai_provider TEXT,
+            points_earned REAL,
+            max_points REAL
         )
     """)
     conn.commit()
@@ -79,6 +88,9 @@ def init_db():
         conn.execute("ALTER TABLE scans ADD COLUMN image_path TEXT")
     if "scanned_by" not in existing_columns:
         conn.execute("ALTER TABLE scans ADD COLUMN scanned_by TEXT")
+    for column, sql_type in [("extracted_text", "TEXT"), ("ai_analysis_json", "TEXT"), ("ai_provider", "TEXT"), ("points_earned", "REAL"), ("max_points", "REAL")]:
+        if column not in existing_columns:
+            conn.execute(f"ALTER TABLE scans ADD COLUMN {column} {sql_type}")
     conn.commit()
     conn.close()
 
@@ -150,7 +162,8 @@ async def scan_product(
 
     # Save uploaded image with a unique name so two officers scanning a
     # "chips.jpg" on the same day don't overwrite each other's evidence photo
-    safe_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
+    original_name = os.path.basename(file.filename or "uploaded_label.png")
+    safe_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid4().hex[:10]}_{original_name}"
     file_path = os.path.join(UPLOAD_DIR, safe_name)
     with open(file_path, "wb") as f:
         f.write(await file.read())
@@ -170,9 +183,12 @@ async def scan_product(
     test_image_path = os.path.join(TEST_IMAGES_DIR, test_image_name)
     shutil.copy(file_path, test_image_path)
 
-    # OCR
+    # Image quality pre-check + OCR + optional multi-provider AI vision.
+    image_quality = assess_image_quality(file_path)
     blocks = extract_text_from_image(file_path)
-    full_text = get_full_text(blocks)
+    ai_text = ai_extract_text(file_path)
+    ai_analysis = ai_analyze_label(file_path)
+    full_text = build_combined_text(blocks, ai_text)
 
     # Calibration from coin taps, if provided
     pixels_per_mm = None
@@ -194,10 +210,13 @@ async def scan_product(
     conn = sqlite3.connect(DB_PATH)
     conn.execute(
         """INSERT INTO scans
-           (image_name, image_path, scanned_by, scan_time, compliance_score, overall_status, checks_json)
-           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+           (image_name, image_path, scanned_by, scan_time, compliance_score, overall_status, checks_json,
+            extracted_text, ai_analysis_json, ai_provider, points_earned, max_points)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (file.filename, file_path, user["username"], datetime.now().isoformat(),
-         result["compliance_score"], result["overall_status"], json.dumps(result["checks"]))
+         result["compliance_score"], result["overall_status"], json.dumps(result["checks"]),
+         full_text, json.dumps(ai_analysis), ai_analysis.get("provider_used"),
+         result.get("points_earned"), result.get("max_points"))
     )
     conn.commit()
     scan_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
@@ -207,6 +226,11 @@ async def scan_product(
         "scan_id": scan_id,
         "image_name": file.filename,
         "extracted_text": full_text,
+        "ocr_blocks": blocks,
+        "ai_extracted_text": ai_text,
+        "ai_ocr_enabled": ai_text is not None,
+        "ai_analysis": ai_analysis,
+        "image_quality": image_quality,
         **result
     }
 
