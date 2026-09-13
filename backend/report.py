@@ -53,16 +53,6 @@ def _recommendations(checks):
     return recs or ["No immediate corrective action identified by the deterministic checks."]
 
 
-def _ai_summary(ai_analysis):
-    if not ai_analysis:
-        return None, []
-    analysis = ai_analysis.get("analysis") if isinstance(ai_analysis, dict) else None
-    if not isinstance(analysis, dict):
-        return None, []
-    summary = analysis.get("product_name") or analysis.get("brand")
-    issues = analysis.get("possible_issues") or []
-    return summary, issues if isinstance(issues, list) else [str(issues)]
-
 
 def generate_pdf_report(scan_row: dict, output_dir: str) -> str:
     os.makedirs(output_dir, exist_ok=True)
@@ -91,7 +81,7 @@ def generate_pdf_report(scan_row: dict, output_dir: str) -> str:
         [Paragraph("Report ID", small), Paragraph(str(scan_row["id"]), small), Paragraph("Overall Result", small), Paragraph(str(scan_row.get("overall_status", "N/A")), small)],
         [Paragraph("Product Image", small), Paragraph(escape(scan_row.get("image_name", "")), small), Paragraph("Points Scored", small), Paragraph(points_text, small)],
         [Paragraph("Scan Time", small), Paragraph(escape(str(scan_row.get("scan_time", ""))), small), Paragraph("Compliance Score", small), Paragraph(score_text, small)],
-        [Paragraph("Scanned By", small), Paragraph(escape(str(scan_row.get("scanned_by") or "N/A")), small), Paragraph("AI Support", small), Paragraph(escape(str(scan_row.get("ai_provider") or "Not enabled")), small)],
+        [Paragraph("Scanned By", small), Paragraph(escape(str(scan_row.get("scanned_by") or "N/A")), small), Paragraph("Inspection Method", small), Paragraph("OCR + Rules Engine", small)],
     ]
     info_table = Table(info, colWidths=[27*mm, 68*mm, 32*mm, 55*mm])
     info_table.setStyle(TableStyle([
@@ -143,27 +133,15 @@ def generate_pdf_report(scan_row: dict, output_dir: str) -> str:
 
     extracted = scan_row.get("extracted_text") or ""
     if extracted:
-        elements.append(Paragraph("4. Extracted Text (OCR + AI)", heading))
+        elements.append(Paragraph("4. Extracted Text (OCR)", heading))
         elements.append(Paragraph(escape(extracted).replace("\n", "<br/>"), small))
 
-    ai_analysis = _load_json(scan_row.get("ai_analysis_json"), {})
-    ai_summary, ai_issues = _ai_summary(ai_analysis)
-    if ai_analysis:
-        elements.append(Paragraph("5. AI Visual Review", heading))
-        provider = ai_analysis.get("provider_used") or ", ".join(ai_analysis.get("providers", [])) or "AI enabled"
-        elements.append(Paragraph(f"Provider: {escape(provider)}", small))
-        if ai_summary:
-            elements.append(Paragraph(f"AI-observed product/brand: {escape(str(ai_summary))}", small))
-        for issue in ai_issues[:8]:
-            elements.append(Paragraph(f"• {escape(str(issue))}", small))
-        elements.append(Spacer(1, 5))
-
-    elements.append(Paragraph("6. Recommendations", heading))
+    elements.append(Paragraph("5. Recommendations", heading))
     for rec in _recommendations(checks):
         elements.append(Paragraph(f"• {escape(rec)}", small))
 
     elements.append(Spacer(1, 12))
-    elements.append(Paragraph("Audit note: AI output is advisory. Final compliance status and points are produced by the deterministic rules engine configured in this application.", small))
+    elements.append(Paragraph("Audit note: Compliance status and points are produced by the deterministic rules engine configured in this application.", small))
     doc.build(elements)
     return file_path
 
@@ -225,25 +203,14 @@ def generate_docx_report(scan_row: dict, output_dir: str) -> str:
 
     extracted = scan_row.get("extracted_text") or ""
     if extracted:
-        doc.add_heading("4. Extracted Text (OCR + AI)", level=2)
+        doc.add_heading("4. Extracted Text (OCR)", level=2)
         doc.add_paragraph(extracted)
 
-    ai_analysis = _load_json(scan_row.get("ai_analysis_json"), {})
-    ai_summary, ai_issues = _ai_summary(ai_analysis)
-    if ai_analysis:
-        doc.add_heading("5. AI Visual Review", level=2)
-        provider = ai_analysis.get("provider_used") or ", ".join(ai_analysis.get("providers", [])) or "AI enabled"
-        doc.add_paragraph(f"Provider: {provider}")
-        if ai_summary:
-            doc.add_paragraph(f"AI-observed product/brand: {ai_summary}")
-        for issue in ai_issues[:8]:
-            doc.add_paragraph(str(issue), style="List Bullet")
-
-    doc.add_heading("6. Recommendations", level=2)
+    doc.add_heading("5. Recommendations", level=2)
     for rec in _recommendations(checks):
         doc.add_paragraph(rec, style="List Bullet")
 
-    doc.add_paragraph("Audit note: AI output is advisory. Final compliance status and points are produced by the deterministic rules engine configured in this application.")
+    doc.add_paragraph("Audit note: Compliance status and points are produced by the deterministic rules engine configured in this application.")
     doc.add_heading("Officer Notes (editable)", level=2)
     doc.add_paragraph("\n\n____________________________________________________________")
     doc.save(file_path)

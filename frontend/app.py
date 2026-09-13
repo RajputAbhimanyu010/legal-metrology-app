@@ -22,27 +22,74 @@ st.set_page_config(page_title="Legal Metrology Compliance Checker", page_icon="�
 
 st.markdown("""
 <style>
-:root { --navy:#123f7a; --navy2:#0d315e; --blue:#2f75c8; --green:#25a66a; --red:#e64b4b; --amber:#e7a625; --purple:#7650d9; --ink:#17365d; --muted:#667085; --line:#d8e3ef; --soft:#f5f9fd; }
-.stApp { background: linear-gradient(180deg,#f7fbff 0%,#ffffff 45%); color:var(--ink); }
-[data-testid="stSidebar"] { background: linear-gradient(180deg,#0b203d 0%,#102d51 100%); }
+:root { --navy:#123b68; --navy2:#0b2949; --blue:#1d6fa5; --cyan:#2f8fb8; --green:#168a5a; --red:#c93c45; --amber:#b77b12; --ink:#17324d; --muted:#607286; --line:#c9d9e8; --soft:#eef5fb; --panel:#f8fbfe; }
+.stApp { background:linear-gradient(135deg,#eaf3fb 0%,#f6f9fc 48%,#edf4f8 100%); color:var(--ink); }
+[data-testid="stSidebar"] { background:linear-gradient(180deg,#082746 0%,#0e3c63 55%,#123f67 100%); }
 [data-testid="stSidebar"] * { color:#fff !important; }
+[data-testid="stSidebar"] [data-testid="stRadio"] label { background:rgba(255,255,255,.07); border-radius:8px; padding:7px 10px; margin:3px 0; }
+[data-testid="stSidebar"] [data-testid="stRadio"] label:hover { background:rgba(255,255,255,.14); }
 .block-container { padding-top:1rem; max-width:1400px; }
-.hero { background:linear-gradient(90deg,#0e3b72,#145a9c); color:white; padding:16px 24px; border-radius:9px; box-shadow:0 4px 16px rgba(18,63,122,.16); margin-bottom:16px; }
-.hero h1 { font-size:28px; margin:0; color:white; }
-.hero p { margin:4px 0 0; opacity:.88; }
-.card { background:white; border:1px solid var(--line); border-radius:9px; padding:18px; box-shadow:0 2px 9px rgba(18,63,122,.06); height:100%; }
+.hero { background:linear-gradient(105deg,#0b3155,#176b98); color:white; padding:24px 28px; border-radius:14px; box-shadow:0 8px 24px rgba(10,45,75,.18); margin-bottom:18px; border:1px solid rgba(255,255,255,.15); }
+.hero h1 { font-size:30px; margin:0; color:white; }
+.hero p { margin:6px 0 0; color:#e5f4ff; opacity:.95; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; box-shadow:0 4px 14px rgba(22,58,91,.08); height:100%; }
+.card:hover { border-color:#91b9d4; box-shadow:0 7px 18px rgba(22,58,91,.12); }
 .card h3 { color:var(--navy); font-size:17px; margin:0 0 8px; }
-.card p,.card li { color:#44546a; font-size:14px; }
-.section-title { color:var(--navy); font-weight:750; font-size:20px; margin:10px 0; }
+.card p,.card li { color:#425a70; font-size:14px; line-height:1.55; }
+.section-title { color:#0d3b66; font-weight:800; font-size:22px; margin:14px 0 10px; }
+.subtle { background:#e4f0f8; border-left:5px solid #2f8fb8; padding:13px 16px; border-radius:8px; color:#294b66; margin:10px 0 18px; }
+.quick { background:linear-gradient(135deg,#ffffff,#e8f3fa); border:1px solid #bfd4e5; border-radius:12px; padding:18px; }
 .badge { display:inline-block; padding:5px 10px; border-radius:20px; font-weight:700; font-size:12px; }
-.badge-green { background:#e9f8ef; color:#16854f; } .badge-red { background:#fff0f0; color:#c73535; } .badge-amber { background:#fff7e6; color:#a46b00; }
-.score-ring { border:7px solid #25a66a; width:130px; height:130px; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; margin:auto; background:#f6fffa; }
-.score-ring b { font-size:29px; color:#16854f; } .score-ring span { color:#607083; font-size:12px; }
-.small-muted { color:#667085; font-size:12px; }
-.check-row { border:1px solid var(--line); border-radius:8px; padding:9px 12px; margin:6px 0; background:#fff; }
-.image-frame { border:1px solid var(--line); border-radius:8px; padding:6px; background:#fff; }
-[data-testid="stMetric"] { background:white; border:1px solid var(--line); padding:10px 12px; border-radius:8px; }
-button[kind="primary"] { background:#1469b8; }
+.badge-green { background:#dff5e9; color:#147447; } .badge-red { background:#ffe5e7; color:#ae2834; } .badge-amber { background:#fff0ce; color:#8f6200; }
+.score-box { background:#e8f4fb; border:1px solid #b9d3e5; border-radius:12px; padding:18px; text-align:center; }
+.score-box b { font-size:32px; color:#0c5b85; }
+.small-muted { color:#607286; font-size:12px; }
+.check-row { border:1px solid #c8d8e6; border-radius:9px; padding:11px 13px; margin:7px 0; background:#f7fbfe; }
+.image-frame { border:1px solid #b9cfdf; border-radius:10px; padding:7px; background:#f7fbfe; }
+[data-testid="stMetric"] { background:#e8f2f8; border:1px solid #bfd4e4; padding:11px 13px; border-radius:10px; }
+[data-testid="stMetricLabel"] { color:#36556f !important; }
+[data-testid="stMetricValue"] { color:#0d456b !important; }
+button[kind="primary"] { background:#12679b !important; border-color:#12679b !important; color:#ffffff !important; }
+button[kind="primary"]:hover { background:#0d527e !important; border-color:#0d527e !important; color:#ffffff !important; }
+
+/* Clear, visible secondary controls */
+button[kind="secondary"],
+div.stButton > button:not([kind="primary"]),
+div.stFormSubmitButton > button:not([kind="primary"]) {
+    background:#e8f2fb !important;
+    color:#123f7a !important;
+    border:1px solid #9fc2e3 !important;
+    border-radius:7px !important;
+    font-weight:650 !important;
+}
+button[kind="secondary"]:hover,
+div.stButton > button:not([kind="primary"]):hover,
+div.stFormSubmitButton > button:not([kind="primary"]):hover {
+    background:#d3e7f8 !important;
+    color:#0d315e !important;
+    border-color:#6ea4d1 !important;
+}
+
+/* Report download buttons */
+[data-testid="stDownloadButton"] button {
+    background:#1769aa !important;
+    color:#ffffff !important;
+    border:1px solid #1769aa !important;
+    border-radius:7px !important;
+    font-weight:700 !important;
+}
+[data-testid="stDownloadButton"] button:hover {
+    background:#0d527e !important;
+    color:#ffffff !important;
+    border-color:#0d527e !important;
+}
+
+/* Keep extracted OCR text easy to read */
+.stTextArea textarea {
+    background:#f8fbff !important;
+    color:#17365d !important;
+    border:1px solid #b8cde2 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -75,9 +122,9 @@ def show_result(result, key_prefix="result"):
     score = result.get("compliance_score")
     with cols[0]:
         if score is not None:
-            st.markdown(f'<div class="score-ring"><b>{score}</b><span>/ 100 points</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="score-box"><div class="small-muted">Compliance Score</div><b>{score}%</b><div class="small-muted">out of 100</div></div>', unsafe_allow_html=True)
         else:
-            st.info("Score not applicable")
+            st.markdown('<div class="score-box"><div class="small-muted">Compliance Score</div><b>N/A</b></div>', unsafe_allow_html=True)
     cols[1].metric("Points Scored", f"{result.get('points_earned','N/A')} / {result.get('max_points','N/A')}")
     cols[2].metric("Fields Scored", result.get("total_checks_scored", "N/A"))
     quality = result.get("image_quality", {})
@@ -97,28 +144,8 @@ def show_result(result, key_prefix="result"):
             else:
                 st.success("Image passed the basic resolution, lighting, contrast and sharpness checks.")
 
-    st.markdown('<div class="section-title">OCR / AI Extraction</div>', unsafe_allow_html=True)
-    st.text_area("Extracted text used by the rules engine", result.get("extracted_text", ""), height=150, key=f"ocr_{key_prefix}")
-    if result.get("ai_extracted_text"):
-        with st.expander("AI vision extraction"):
-            st.text(result["ai_extracted_text"])
-    ai = result.get("ai_analysis") or {}
-    if ai.get("analysis"):
-        with st.expander("AI visual review & recommendations"):
-            analysis = ai["analysis"]
-            if isinstance(analysis, dict):
-                if analysis.get("product_name") or analysis.get("brand"):
-                    st.write(f"**Product/Brand:** {analysis.get('product_name','')} {analysis.get('brand','')}")
-                for label in ["visible_declarations", "possible_issues", "recommendations", "tamper_or_editing_signals"]:
-                    values = analysis.get(label)
-                    if values:
-                        st.write(f"**{label.replace('_',' ').title()}**")
-                        for value in values if isinstance(values, list) else [values]:
-                            st.write(f"- {value}")
-                if analysis.get("label_readability"):
-                    st.write(f"**AI readability:** {analysis['label_readability']}")
-            else:
-                st.code(str(analysis))
+    st.markdown('<div class="section-title">OCR Extracted Information</div>', unsafe_allow_html=True)
+    st.text_area("Text extracted from the product label", result.get("extracted_text", ""), height=150, key=f"ocr_{key_prefix}")
 
 
 def download_reports(scan_id, key_prefix):
@@ -142,7 +169,7 @@ def download_reports(scan_id, key_prefix):
 
 # ---------------- LOGIN ----------------
 if "token" not in st.session_state:
-    st.markdown('<div class="hero"><h1>Legal Metrology Compliance Checker</h1><p>AI-assisted packaged commodity compliance inspection</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero"><h1>Legal Metrology Compliance Checker</h1><p>Packaged commodity compliance inspection</p></div>', unsafe_allow_html=True)
     c1, c2 = st.columns([1, 1.5])
     with c1:
         st.markdown('<div class="card"><h3>🔐 Secure Officer Login</h3><p>Sign in to scan labels, review evidence and export audit-ready reports.</p></div>', unsafe_allow_html=True)
@@ -168,7 +195,7 @@ if "token" not in st.session_state:
 # ---------------- SHELL ----------------
 with st.sidebar:
     st.markdown("## 🛡️ Legal Metrology")
-    st.caption(f"Welcome, {st.session_state['username']} · {st.session_state['role']}")
+    st.markdown(f"**{st.session_state['username']}** · {st.session_state['role'].title()}")
     nav = ["Home", "Upload Image", "Test Images", "Reports", "History", "Settings"]
     if st.session_state["role"] == "admin":
         nav.append("Admin Users")
@@ -181,23 +208,34 @@ st.markdown('<div class="hero"><h1>Legal Metrology Compliance Checker</h1><p>Pac
 
 # ---------------- HOME ----------------
 if page == "Home":
-    st.markdown('<div class="section-title">AI-assisted packaged commodity inspection</div>', unsafe_allow_html=True)
-    st.write("Upload a label photo, check the actual image quality, extract declarations using OCR + optional AI vision, evaluate deterministic Legal Metrology rules, and export evidence-ready PDF/Word reports.")
-    cards = [
-        ("🧠", "Improved OCR", ["Multiple preprocessing passes", "Noise reduction & contrast enhancement", "Upscaling for small text", "Duplicate detection removal"]),
-        ("✦", "AI Integration (Optional)", ["Local Ollama + Gemma vision", "Optional Gemini REST provider", "AI extraction + visual review", "AI kept separate for audit"]),
-        ("⌂", "Home / Workflow", ["Upload → Check → Analyze", "Image quality pre-check", "Deterministic scoring", "Evidence-first reporting"]),
-        ("▧", "Test Images", ["Compliant sample", "Missing MRP", "Missing consumer care", "Blurred label"]),
-        ("▤", "Reports", ["PDF + editable Word", "Original test image included", "Points scored", "Detailed analysis & recommendations"]),
-    ]
-    row = st.columns(5)
-    for col, (icon,title,items) in zip(row,cards):
+    st.markdown('<div class="section-title">Inspection Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subtle"><b>Legal Metrology packaged-commodity checker</b><br>Upload a product-label image to run image-quality checks, OCR extraction, deterministic compliance checks and evidence-ready reporting.</div>', unsafe_allow_html=True)
+
+    c1,c2,c3 = st.columns(3)
+    for col, icon, title, text in [
+        (c1,"📷","Inspect a label","Upload a clear product-label image and verify the declarations visible on the package."),
+        (c2,"✓","Check compliance","OCR reads the label and the rules engine evaluates the configured Legal Metrology requirements."),
+        (c3,"📄","Create evidence report","Review the score, findings and original test image, then export PDF or editable Word."),
+    ]:
         with col:
-            st.markdown(f'<div class="card"><h3>{icon} {title}</h3><ul>{"".join(f"<li>{x}</li>" for x in items)}</ul></div>', unsafe_allow_html=True)
-    st.markdown("### Recommended workflow")
-    c1,c2,c3,c4 = st.columns(4)
-    for col, n, title, text in [(c1,"1","Upload","Choose the product-label image."),(c2,"2","Check","Run image quality + OCR + AI vision."),(c3,"3","Analyze","Review PASS/WARN/FAIL and score."),(c4,"4","Export","Download PDF/Word with image evidence.")]:
-        col.markdown(f'<div class="card"><h3>{n}. {title}</h3><p>{text}</p></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="card"><h3>{icon} {title}</h3><p>{text}</p></div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="section-title">Quick start</div>', unsafe_allow_html=True)
+    q1,q2 = st.columns(2)
+    with q1:
+        st.markdown('<div class="quick"><h3>Start a new inspection</h3><p>Go to <b>Upload Image</b> and select the product-label photo you want to check.</p></div>', unsafe_allow_html=True)
+    with q2:
+        st.markdown('<div class="quick"><h3>Review previous inspections</h3><p>Use <b>History</b> to view earlier scans, findings, scores and evidence images.</p></div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="section-title">Included sample tests</div>', unsafe_allow_html=True)
+    a,b,c,d = st.columns(4)
+    for col, title, detail in [
+        (a,"Compliant label","Expected declarations present"),
+        (b,"Missing MRP","Tests missing-price detection"),
+        (c,"Missing consumer care","Tests contact-detail detection"),
+        (d,"Blurred label","Tests image-quality warning"),
+    ]:
+        col.markdown(f'<div class="card"><h3>{title}</h3><p>{detail}</p></div>', unsafe_allow_html=True)
 
 # ---------------- UPLOAD ----------------
 elif page == "Upload Image":
@@ -240,14 +278,16 @@ elif page == "Upload Image":
             if st.button("🔍 Run Compliance Check", type="primary", use_container_width=True):
                 files = {"file": (uploaded_file.name, uploaded_file.getvalue())}
                 data = {"coin_left_x":coin_left_x,"coin_right_x":coin_right_x,"coin_type":coin_type} if use_calibration else {}
-                with st.spinner("Checking image → OCR → AI vision → rules engine → report data..."):
+                with st.spinner("Checking image → fast OCR → rules engine → report data..."):
                     try:
-                        r = api_post("/scan", files=files, data=data, timeout=180)
+                        r = api_post("/scan", files=files, data=data, timeout=60)
                         if r.status_code == 200:
                             st.session_state["last_scan_result"] = r.json()
                             st.session_state["last_upload_name"] = uploaded_file.name
                             st.success("Inspection completed. The uploaded image has been checked and saved as evidence.")
                         else: st.error(r.text)
+                    except requests.Timeout:
+                        st.error("The OCR scan timed out. The first EasyOCR run can take longer while its model loads; check the backend terminal for [OCR] timing. Retry once the model is loaded.")
                     except requests.RequestException as e: st.error(f"Backend error: {e}")
 
     if st.session_state.get("last_scan_result"):
@@ -336,10 +376,9 @@ elif page == "History":
 
 # ---------------- SETTINGS ----------------
 elif page == "Settings":
-    st.markdown('<div class="section-title">Settings & AI Configuration</div>', unsafe_allow_html=True)
-    st.markdown('<div class="card"><h3>AI architecture</h3><p><b>OCR:</b> EasyOCR + preprocessing ensemble. <b>Vision AI:</b> optional Ollama/Gemma and optional Gemini REST. <b>Compliance:</b> deterministic rules engine. <b>Reports:</b> original evidence image + points + analysis.</p><p>AI suggestions are advisory and remain separate from the legal rules used for the final score.</p></div>', unsafe_allow_html=True)
-    st.code("AI_OCR_ENABLED=true\nOLLAMA_URL=http://127.0.0.1:11434\nOLLAMA_MODEL=gemma3:4b\nGEMINI_ENABLED=false\nGEMINI_API_KEY=...\nGEMINI_MODEL=gemini-2.5-flash", language="bash")
-    st.info("For a privacy-first demo, keep Gemini disabled and run Ollama locally. For production/legal use, verify the current Legal Metrology rules and independently review AI findings.")
+    st.markdown('<div class="section-title">Application Settings</div>', unsafe_allow_html=True)
+    st.markdown('<div class="card"><h3>Inspection configuration</h3><p>This version uses local image-quality checks, OCR and the deterministic Legal Metrology rules engine. No external AI service is required.</p><p><b>OCR:</b> EasyOCR &nbsp; · &nbsp; <b>Compliance:</b> deterministic rules &nbsp; · &nbsp; <b>Reports:</b> PDF + editable Word</p></div>', unsafe_allow_html=True)
+    st.info("For faster testing, use a clear, tightly cropped label image. The first OCR run may take longer while the OCR model loads; later scans are normally faster.")
 
 # ---------------- ADMIN ----------------
 elif page == "Admin Users":
