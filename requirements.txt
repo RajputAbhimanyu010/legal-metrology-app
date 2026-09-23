@@ -9,3 +9,6 @@ Pillow
 streamlit-image-coordinates
 python-docx
 passlib
+opencv-python-headless
+numpy
+python-dotenv

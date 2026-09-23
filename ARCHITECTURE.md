@@ -65,7 +65,7 @@ by scanning a photo of the product label.
 | Frontend | `frontend/app.py` | Login screen, image upload, coin-based calibration UI, results display, dashboard with search/filter, admin user management |
 | Authentication | `backend/auth.py` | Password hashing (PBKDF2-SHA256), JWT issuance/validation, role storage (officer/admin) |
 | API layer | `backend/main.py` | REST endpoints, request validation, orchestrates OCR → rules engine → DB → report generation, enforces role-based access |
-| OCR | `ocr/extract_text.py` | Extracts text + bounding boxes from label images using EasyOCR; resizes large images for speed |
+| OCR | `ocr/extract_text.py` | One-pass EasyOCR and image-quality checks |
 | Rules Engine | `rules_engine/checker.py` | Encodes Legal Metrology Rule 6/7 requirements as executable checks; computes compliance score |
 | Report Generation | `backend/report.py` | Produces fixed PDF (ReportLab) and editable DOCX (python-docx) compliance reports |
 | Data storage | SQLite (`compliance.db`) | `users` table (accounts/roles), `scans` table (results, evidence photo path, who scanned it, timestamp) |
@@ -76,7 +76,7 @@ by scanning a photo of the product label.
 1. Officer logs in → receives a JWT access token (valid 12 hours)
 2. Officer uploads a label photo, optionally marks a reference coin's edges for font-size calibration
 3. Frontend sends the image (+ coin data) to `POST /scan` with the JWT in the Authorization header
-4. Backend saves the image to `uploaded_images/`, runs OCR to extract text + bounding boxes
+4. Backend saves the image to `uploaded_images/`, runs one-pass OCR to extract text + bounding boxes
 5. Extracted text is passed to the rules engine, which checks it against Rule 6/7 requirements and returns a checklist + compliance score
 6. Result is saved to the `scans` table (including who scanned it and the evidence photo path)
 7. Frontend displays the checklist; officer can request a PDF or editable DOCX report on demand
